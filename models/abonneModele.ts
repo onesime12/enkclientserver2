@@ -1,7 +1,7 @@
 //init code
 import mongoose from "mongoose";
 
-const abonneSchema = mongoose.Schema({
+const abonneSchema = new mongoose.Schema({
   aboName: {
     type: String,
     required: true,

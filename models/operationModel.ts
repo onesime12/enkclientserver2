@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 
 //user schema
-const operationSchema = mongoose.Schema({
+const operationSchema = new mongoose.Schema({
   operateur: {
     type: String,
     required: true,
