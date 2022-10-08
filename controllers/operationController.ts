@@ -30,7 +30,7 @@ export const postOperation = async(data)=>{
         userName: userFind.userName,
         prix: data.prix,
         numCompteur: userFind.compteurNumber,
-        userId: userFind._id,
+        operationId: userFind._id,
     })
     const userBalanceUpdated = await User.updateOne(
       {compteurNumber:userFind.compteurNumber},
