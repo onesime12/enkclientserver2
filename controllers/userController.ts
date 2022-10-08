@@ -1,141 +1,69 @@
 import express from "express";
 import bodyParser from "body-parser";
-import user from "../models/userModel";
-import abonne from "../models/abonneModele";
-import { hashedPassword } from "../utils/hashPassword";
+import User from "../models/userModel";
+import Abonne from "../models/abonneModele";
+import { hashedPassword } from "../utils/motDepasse";
 const router = express.Router();
 //middleware goes here
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
-//default route
-router.all("/", (req, res) => {
-  return res.json({
-    status: true,
-    message: "user controller is working...",
-  });
-});
-
-//creat new user route
-router.post("/user", async (req, res) => {
+//creat new user document route
+export const postUser =async (compteur,data) => {
   try {
-    const hashedPwd = await hashedPassword(req.body.password);
-
-    const abonneFind = await abonne.findOne({
-      compteurNumber: req.body.compteur,
-    });
-    console.log(abonneFind);
+    const abonneFind=await Abonne.findOne({compteurNumber:"09778652377"});
     if (!abonneFind) {
-      return res.status(400).json({
-        status: false,
-        message: "Abonné not found...",
-      });
+      return new Error("abonne not found...");
     }
-    const newUser = await user.create({
-      userName: req.body.username,
-      compteurNumber: abonneFind.compteurNumber,
-      password: hashedPwd,
-      abonneId: abonneFind._id,
+    const wordPassWord = await hashedPassword(data.password);
+    const newUser= await User.create({
+      userName:data.username,
+      compteurNumber:abonneFind.compteurNumber,
+      password:wordPassWord,
+      abonneId:abonneFind._id
     });
-    return res.status(200).json({
-      newUser,
-      status: true,
-      message: "Sucess account created...",
-    });
+    return newUser
   } catch (error) {
-    return res.status(400).json({
-      status: false,
-      message: "Echec d'enregistrement...",
-    });
+    return error
   }
-});
+}
 
-// find user documents route
-router.get("/users", async (req, res) => {
-  //find user document
+//get all user document route
+export const getUser =async () => {
   try {
-    const allUsers = await user.find();
-    if (!allUsers) {
-      return res.json({
-        status: false,
-        message: "user not found",
-      });
+    const userFinds=await User.find({});
+    return userFinds
+  } catch (error) {
+    return error
+  }
+}
+
+// update user document route
+export const putUser=async (compteur,data) => {
+  try {
+    console.log(compteur);
+    
+    const userFind =await User.findOne({compteurNumber:compteur});
+    console.log(userFind);
+    
+    if(!userFind){
+      const userNoteFouond = "user not found for Updating...";
+      return userNoteFouond;
     }
-    return res.json({
-      status: true,
-      message: "You have getten all users...",
-      allUsers,
-    });
-  } catch (error) {
-    return res.json(error);
-  }
-});
-
-// find user by email
-router.get("/user", async (req, res) => {
-  try {
-    const userFind = await user.findOne(
-      { compteurNumber: req.body.compteur },
-      { password: 0 }
+    console.log(userFind);
+    
+    const userUpdeted=await User.findByIdAndUpdate(
+      userFind._id,
+      {balance:userFind.balance+data.somme},
+      {new:true}
     );
-    if (!userFind) {
-      return res.json({
-        status: false,
-        message: "user not found",
-      });
-    }
-    return res.json(userFind);
+    if(userUpdeted){
+      const succesMessage = "succefully user updated ..."
+      return [userUpdeted, succesMessage]
+    };
   } catch (error) {
-    return res.json(error);
+    
   }
-});
-
-//Update user document
-router.put("/user/:compteur", async (req, res) => {
-  const compteurNumber = req.params.compteur;
-  try {
-    const findUser = await user.findOne({ compteurNumber });
-    if (!findUser) {
-      return res.status(404).json({
-        status: false,
-        message: "user not found...",
-      });
-    }
-    const findUserUpdated = await user.findOneAndUpdate(
-      { _id: findUser._id },
-      { balance: findUser.balance + Number(req.body.somme) },
-      { new: true }
-    );
-    return res.status(201).json({
-      status: true,
-      message: "Succes updating user...",
-      user: findUserUpdated,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-});
-
-//remove user docement
-router.delete("/user/:compteur", async (req, res) => {
-  try {
-    const userDelete = await user.findOneAndRemove({
-      compteurNumber: req.params.compteur,
-    });
-    if (!userDelete) {
-      return res.json({
-        status: false,
-        message: "Cet utilisateur n'est pas retrouvé pour être supprimé...",
-      });
-    }
-    return res.status(200).json({
-      status: true,
-      message: "Cet utilisateur a été supprimé avec succès...",
-    });
-  } catch (error) {
-    return res.status(400).json();
-  }
-});
+}
 
 export default router;
