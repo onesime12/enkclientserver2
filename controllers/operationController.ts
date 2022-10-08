@@ -9,10 +9,9 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 //create operation
-export const postOperation = async(data)=>{
+export const postOperation = async(compteur, data)=>{
   try {
-    const userFind=await User.findOne({compteurNumber:data.compteur});
-    console.log(userFind)
+    const userFind=await User.findOne({compteurNumber:compteur});
     if (!userFind) {
       const message = "user not found with this compter number...";
       return message;
@@ -31,7 +30,11 @@ export const postOperation = async(data)=>{
         prix: data.prix,
         numCompteur: userFind.compteurNumber,
         operationId: userFind._id,
-    })
+    });
+    if(!newCode){
+      return new Error()
+    }
+
     const userBalanceUpdated = await User.updateOne(
       {compteurNumber:userFind.compteurNumber},
       {balance:userFind.balance-data.prix},

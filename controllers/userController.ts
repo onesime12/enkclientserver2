@@ -11,7 +11,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 //creat new user document route
 export const postUser =async (compteur,data) => {
   try {
-    const abonneFind=await Abonne.findOne({compteurNumber:"09778652377"});
+    const abonneFind=await Abonne.findOne({compteurNumber:compteur});
     if (!abonneFind) {
       return new Error("abonne not found...");
     }
