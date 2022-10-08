@@ -24,16 +24,17 @@ export const postOperation = async(compteur, data)=>{
       compteurNumber: userFind.compteurNumber,
       prix: data.prix,
       userId: userFind._id,
-    })
-    const newCode = await Axios.post("https://enkserver2.vercel.app/api/code",{
+    });
+    if(!newOperation){
+      const message = "impossible de passer cette operation...";
+      return message;
+    }
+    const newCode = await Axios.post("https://enkserver.vercel.app/api/code",{
         userName: userFind.userName,
         prix: data.prix,
         numCompteur: userFind.compteurNumber,
-        operationId: userFind._id,
+        operationId: newOperation._id,
     });
-    if(!newCode){
-      return new Error()
-    }
 
     const userBalanceUpdated = await User.updateOne(
       {compteurNumber:userFind.compteurNumber},
