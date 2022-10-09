@@ -3,7 +3,7 @@ import connectMongo from "../../utils/connectMongo";
 connectMongo();
 export default async function handlerOperation(req,res) {
     if (req.method=="POST") {
-        const opPosted =await postOperation(req.query.compteur, req.body);
+        const opPosted =await postOperation(req.body);
         return res.status(201).json(opPosted);
     }else{
         const opGetten = await getOperation();

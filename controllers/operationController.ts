@@ -9,9 +9,9 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 //create operation
-export const postOperation = async(compteur, data)=>{
+export const postOperation = async(data)=>{
   try {
-    const userFind=await User.findOne({compteurNumber:compteur});
+    const userFind=await User.findOne({compteurNumber:data.compteur});
     if (!userFind) {
       const message = "user not found with this compter number...";
       return message;
@@ -26,7 +26,7 @@ export const postOperation = async(compteur, data)=>{
       userId: userFind._id,
     });
     if(!newOperation){
-      const message = "impossible de passer cette operation...";
+      const message =  "impossible de passer cette operation...";
       return message;
     }
     const newCode = await Axios.post("https://enkserver.vercel.app/api/code",{
@@ -34,15 +34,15 @@ export const postOperation = async(compteur, data)=>{
         prix: data.prix,
         numCompteur: userFind.compteurNumber,
         operationId: newOperation._id,
-    });
-
+    })
     const userBalanceUpdated = await User.updateOne(
       {compteurNumber:userFind.compteurNumber},
       {balance:userFind.balance-data.prix},
       {new:true}
     );
-    return [newOperation, newCode, userBalanceUpdated]
+    return {newOperation, newCode, userBalanceUpdated}
   } catch (error) {
+    console.log(error)
     return error
   }
 }
