@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
     default: Date.now(),
   },
   abonneId: {
-    type: mongoose.SchemaTypes.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Abonne",
     require: true,
   },
