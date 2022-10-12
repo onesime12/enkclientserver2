@@ -48,7 +48,7 @@ export const putUser=async (compteur,data) => {
     
     if(!userFind){
       const userNoteFouond = "user not found for Updating...";
-      return userNoteFouond;
+      return {code:404,message:userNoteFouond};
     }
     console.log(userFind);
     

@@ -25,6 +25,8 @@ export const postOperation = async(data)=>{
       prix: data.prix,
       userId: userFind._id,
     });
+    console.log(newOperation);
+    
     if(!newOperation){
       const message =  "impossible de passer cette operation...";
       return message;
