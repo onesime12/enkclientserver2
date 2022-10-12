@@ -9,61 +9,58 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 
 //creat new user document route
-export const postUser =async (compteur,data) => {
+export const postUser = async (data) => {
   try {
-    const abonneFind=await Abonne.findOne({compteurNumber:compteur});
-    if (!abonneFind) {
-      return new Error("abonne not found...");
-    }
+    const abonneFind = await Abonne.findOne({ compteurNumber: data.compteur });
+    console.log(abonneFind);
+
     const wordPassWord = await hashedPassword(data.password);
-    const newUser= await User.create({
-      userName:data.username,
-      compteurNumber:abonneFind.compteurNumber,
-      password:wordPassWord,
-      abonneId:abonneFind._id
+    const newUser = await User.create({
+      userName: data.userName,
+      compteurNumber: abonneFind.compteurNumber,
+      password: wordPassWord,
+      abonneId: abonneFind._id,
     });
-    return newUser
+    return newUser;
   } catch (error) {
-    return error
+    return new Error(error);
   }
-}
+};
 
 //get all user document route
-export const getUser =async () => {
+export const getUser = async () => {
   try {
-    const userFinds=await User.find({});
-    return userFinds
+    const userFinds = await User.find({});
+    return userFinds;
   } catch (error) {
-    return error
+    return error;
   }
-}
+};
 
 // update user document route
-export const putUser=async (compteur,data) => {
+export const putUser = async (compteur, data) => {
   try {
     console.log(compteur);
-    
-    const userFind =await User.findOne({compteurNumber:compteur});
+
+    const userFind = await User.findOne({ compteurNumber: compteur });
     console.log(userFind);
-    
-    if(!userFind){
+
+    if (!userFind) {
       const userNoteFouond = "user not found for Updating...";
       return {code:404,message:userNoteFouond};
     }
     console.log(userFind);
-    
-    const userUpdeted=await User.findByIdAndUpdate(
+
+    const userUpdeted = await User.findByIdAndUpdate(
       userFind._id,
-      {balance:userFind.balance+data.somme},
-      {new:true}
+      { balance: userFind.balance + data.balance },
+      { new: true }
     );
-    if(userUpdeted){
-      const succesMessage = "succefully user updated ..."
-      return [userUpdeted, succesMessage]
-    };
-  } catch (error) {
-    
-  }
-}
+    if (userUpdeted) {
+      const succesMessage = "succefully user updated ...";
+      return [userUpdeted, succesMessage];
+    }
+  } catch (error) {}
+};
 
 export default router;
